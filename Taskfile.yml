@@ -1,0 +1,35 @@
+version: "3"
+
+tasks:
+  default:
+    desc: "List available tasks"
+    cmd: task --list
+  
+  lint:
+    desc: "Run linter"
+    cmd: docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.7.2 golangci-lint run
+
+  fmt:
+    desc: "Run formatter"
+    cmds:
+      - docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.7.2 golangci-lint -v fmt
+  test:
+    desc: "Run tests"
+    cmd: go test -v ./...
+
+  build:
+    desc: "Build"
+    cmds:
+      - go build -o bin/snc
+
+  doc:
+    desc: "Generate documentation"
+    cmds:
+      - go run ./tools/docgen -out ./docs/cli -format markdown
+
+  deps:
+    desc: "Install Go module dependencies"
+    cmds:
+      - go mod download
+      - go mod tidy
+

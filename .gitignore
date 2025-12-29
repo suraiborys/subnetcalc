@@ -1,0 +1,28 @@
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.out
+*.cov
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Compiled binary
+/bin
+
+# Config files (may contain sensitive data)
+*.local.toml
+.env
+
+# Temporary files
+tmp/
+temp/
