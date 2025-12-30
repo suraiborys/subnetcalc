@@ -1,3 +1,6 @@
+// Package subnetcalc calculates IPv4 subnet information from CIDR notation.
+// It computes network addresses, broadcast IPs, subnet masks, and address counts
+// for any valid IPv4 prefix.
 package subnetcalc
 
 import (
@@ -7,6 +10,7 @@ import (
 	"net/netip"
 )
 
+// SubnetInfo represents calculated information about an IPv4 subnet.
 type SubnetInfo struct {
 	NetworkAddress netip.Addr
 	BroadcastIP    netip.Addr
@@ -19,12 +23,10 @@ type masks struct {
 	WildcardMask uint32
 }
 
-// calcNetworkAddress parses the network address from a prefix.
 func calcNetworkAddress(prefix netip.Prefix) netip.Addr {
 	return prefix.Masked().Addr()
 }
 
-// calcMasks parses the subnet mask and wildcard mask from a prefix.
 func calcMasks(prefix netip.Prefix) masks {
 	networkBits := prefix.Bits()
 	subnetMask := uint32(0xffffffff << (32 - networkBits))
@@ -32,7 +34,6 @@ func calcMasks(prefix netip.Prefix) masks {
 	return masks{SubnetMask: subnetMask, WildcardMask: wildcardMask}
 }
 
-// calcBroadcastIPAddress parses the broadcast IP address from a network address and wildcard mask.
 func calcBroadcastIPAddress(networkAddress netip.Addr, wildcardMask uint32) netip.Addr {
 	networkAddressUint32 := binary.BigEndian.Uint32(networkAddress.AsSlice())
 	lastIPUint32 := networkAddressUint32 | wildcardMask
@@ -42,12 +43,10 @@ func calcBroadcastIPAddress(networkAddress netip.Addr, wildcardMask uint32) neti
 	return netip.AddrFrom4(lastIPBytesArray)
 }
 
-// calcTotalIP calculates the total number of IPs in a subnet.
 func calcTotalIP(prefix netip.Prefix) uint {
 	return uint(math.Pow(2, float64(32-prefix.Bits())))
 }
 
-// getSingleIPSubnetInfo returns subnet info for a single IP.
 func getSingleIPSubnetInfo(ip netip.Addr) SubnetInfo {
 	return SubnetInfo{
 		NetworkAddress: ip,
@@ -57,7 +56,6 @@ func getSingleIPSubnetInfo(ip netip.Addr) SubnetInfo {
 	}
 }
 
-// convSubnetMaskToIPAddr converts a subnet mask to an IP address.
 func convSubnetMaskToIPAddr(subnetMask uint32) netip.Addr {
 	subnetMaskBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(subnetMaskBytes, subnetMask)
@@ -65,7 +63,22 @@ func convSubnetMaskToIPAddr(subnetMask uint32) netip.Addr {
 	return netip.AddrFrom4(subnetMaskBytesArray)
 }
 
-// CalcSubnetInfo calculates subnet info for a given prefix.
+// CalcSubnetInfo calculates subnet information for the given IPv4 prefix.
+// It returns the network address, broadcast IP, subnet mask, and total IP count.
+//
+// Special cases:
+//   - /32 prefix: single host, NetworkAddress equals BroadcastIP
+//   - IPv6 prefix: returns error (not yet supported)
+//   - Invalid prefix: returns error
+//
+// Example:
+//
+//	prefix := netip.MustParsePrefix("192.168.1.0/24")
+//	info, err := CalcSubnetInfo(prefix)
+//	if err != nil {
+//	    return err
+//	}
+//	fmt.Printf("Network: %s\n", info.NetworkAddress)
 func CalcSubnetInfo(prefix netip.Prefix) (SubnetInfo, error) {
 	if !prefix.IsValid() {
 		return SubnetInfo{}, errors.New("invalid prefix")
