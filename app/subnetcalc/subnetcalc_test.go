@@ -1,11 +1,19 @@
 package subnetcalc
 
 import (
+	"fmt"
 	"net/netip"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func ExampleCalcSubnetInfo() {
+	prefix := netip.MustParsePrefix("172.16.38.94/27")
+	subnetInfo, _ := CalcSubnetInfo(prefix)
+	fmt.Println(subnetInfo.NetworkAddress, subnetInfo.BroadcastIP, subnetInfo.SubnetMask, subnetInfo.TotalIP)
+	// Output: 172.16.38.64 172.16.38.95 255.255.255.224 32
+}
 
 func TestCalcSubnetInfo_InvalidPrefix(t *testing.T) {
 	subnetInfo, err := CalcSubnetInfo(netip.Prefix{})
