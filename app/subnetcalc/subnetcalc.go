@@ -56,9 +56,9 @@ func getSingleIPSubnetInfo(ip netip.Addr) SubnetInfo {
 	}
 }
 
-func convSubnetMaskToIPAddr(subnetMask uint32) netip.Addr {
+func uint32ToAddr(ipInt uint32) netip.Addr {
 	subnetMaskBytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(subnetMaskBytes, subnetMask)
+	binary.BigEndian.PutUint32(subnetMaskBytes, ipInt)
 	subnetMaskBytesArray := [4]byte{subnetMaskBytes[0], subnetMaskBytes[1], subnetMaskBytes[2], subnetMaskBytes[3]}
 	return netip.AddrFrom4(subnetMaskBytesArray)
 }
@@ -94,7 +94,7 @@ func CalcSubnetInfo(prefix netip.Prefix) (SubnetInfo, error) {
 
 	masks := calcMasks(prefix)
 	networkAddress := calcNetworkAddress(prefix)
-	subnetMask := convSubnetMaskToIPAddr(masks.SubnetMask)
+	subnetMask := uint32ToAddr(masks.SubnetMask)
 	broadcastIP := calcBroadcastIPAddress(networkAddress, masks.WildcardMask)
 	totalIP := calcTotalIP(prefix)
 
