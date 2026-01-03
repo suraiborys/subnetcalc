@@ -5,7 +5,6 @@ import (
 	"net/netip"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/suraiborys/subnetcalc/app/subnetcalc"
 )
@@ -30,12 +29,10 @@ snc 192.168.1.0/24`,
 			return fmt.Errorf("error calculating subnet info: %s", err)
 		}
 
-		bold := color.New(color.Bold).SprintFunc()
-
-		fmt.Printf("Network Address:    %s\n", bold(result.NetworkAddress))
-		fmt.Printf("Broadcast Address:  %s\n", bold(result.BroadcastIP))
-		fmt.Printf("Subnet Mask:        %s\n", bold(result.SubnetMask))
-		fmt.Printf("Total IPs:          %s\n", bold(result.TotalIP))
+		fmt.Printf("Network Address:    %s\n", result.NetworkAddress)
+		fmt.Printf("Broadcast Address:  %s\n", result.BroadcastIP)
+		fmt.Printf("Subnet Mask:        %s\n", result.SubnetMask)
+		fmt.Printf("Total IPs:          %d\n", result.TotalIP)
 
 		return nil
 	},
